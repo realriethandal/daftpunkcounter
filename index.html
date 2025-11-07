@@ -225,6 +225,33 @@ input[type="number"] {
   </div>
 <!-- Soundboard -->
 <div class="soundboard" id="soundboard"></div>
+
+
+<div id="musicPlayerContainer" style="display:block; grid-column:1/-1; margin-top:10px; background:#111; border:3px solid #fff; padding:10px;">
+  <!-- ALBUM SELECTION VIEW -->
+  <div id="albumSelection" style="display:flex; flex-wrap:wrap; gap:10px;">
+    <!-- Albums will be dynamically inserted here -->
+  </div>
+
+  <!-- ALBUM PLAYER VIEW -->
+  <div id="albumPlayer" style="display:none; flex-wrap:wrap; gap:20px;">
+<div style="flex:1; min-width:300px;">
+  <img id="albumCover" src="" alt="Album Cover" style="width:100%; max-width:300px; margin-bottom:10px; border:3px solid #fff; border-radius:8px;">
+  <div id="playerEmbed"></div>
+  <button class="btn" id="backBtn" style="margin-top:10px;">BACK TO ALBUMS</button>
+</div>
+
+
+
+    <div style="flex:1; min-width:200px; max-height:400px; overflow:auto;" id="songList">
+      <!-- List of songs in album -->
+    </div>
+  </div>
+</div>
+
+
+
+
 </div>
 
 
@@ -393,6 +420,207 @@ sounds.forEach(s => {
   audio.onended = () => btn.classList.remove("active");
   soundboard.appendChild(btn);
 });
+
+const musicPlayerContainer = document.getElementById("musicPlayerContainer");
+const albumSelection = document.getElementById("albumSelection");
+const albumPlayer = document.getElementById("albumPlayer");
+
+const songList = document.getElementById("songList");
+const backBtn = document.getElementById("backBtn");
+
+let currentAlbum = null;
+let currentSongIndex = 0;
+let player = null;
+
+// ALBUM DATA
+const albums = [
+  {
+    name: "Homework",
+    cover: "homework.png",
+    songs: [
+      { title: "Daftendirekt", url: "https://www.youtube.com/embed/yuoghR-5-Xs" },
+      { title: "WDPK 83.7 FM", url: "https://www.youtube.com/embed/OzZAHvq_UqI" },
+      { title: "Revolution 909", url: "https://www.youtube.com/embed/uURB-vo9rZ4" },
+      { title: "Da Funk", url: "https://www.youtube.com/embed/mmi60Bd4jSs" },
+      { title: "Phœnix", url: "https://www.youtube.com/embed/5AJ8yHebaok" },
+      { title: "Fresh", url: "https://www.youtube.com/embed/6TOXw9zQCAc" },
+      { title: "Around The World", url: "https://www.youtube.com/embed/K0HSD_i2DvA" },
+      { title: "Rollin' & Scratchin", url: "https://www.youtube.com/embed/XlUutoCywnk" },
+      { title: "Teachers", url: "https://www.youtube.com/embed/3yq-NFiEywo" },
+      { title: "High Fidelity", url: "https://www.youtube.com/embed/JXWkKO4eplY" },
+      { title: "Rock'n Roll", url: "https://www.youtube.com/embed/ZW7WfdTuth8" },
+      { title: "Oh Yeah", url: "https://www.youtube.com/embed/zr28TRk9vCg" },
+      { title: "Burnin'", url: "https://www.youtube.com/embed/DBHipNYuAZk" },
+      { title: "Indo Silver Club", url: "https://www.youtube.com/embed/VubH7FuW6TQ" },
+      { title: "Alive", url: "https://www.youtube.com/embed/WY8hqzYT_uk" },
+      { title: "Funk Ad", url: "https://www.youtube.com/embed/YqUyNvGsM9s" }
+    ]
+  },
+  {
+    name: "Discovery",
+    cover: "discovery.png",
+    songs: [
+      { title: "One More Time", url: "https://www.youtube.com/embed/A2VpR8HahKc" },
+      { title: "Aerodynamic", url: "https://www.youtube.com/embed/Mjpu0-o9iek" },
+      { title: "Digital Love", url: "https://www.youtube.com/embed/4whD6uAryMs" },
+      { title: "Harder, Better, Faster, Stronger", url: "https://www.youtube.com/embed/yydNF8tuVmU" },
+      { title: "Crescendolls", url: "https://www.youtube.com/embed/oor2uIqys8M" },
+      { title: "Nightvision", url: "https://www.youtube.com/embed/NQ-mm1H7uJw" },
+      { title: "Superheroes", url: "https://www.youtube.com/embed/UBGfS7S9BYg" },
+      { title: "High Life", url: "https://www.youtube.com/embed/KlUtJOTmmk8" },
+      { title: "Something About Us", url: "https://www.youtube.com/embed/em0MknB6wFo" },
+      { title: "Voyager", url: "https://www.youtube.com/embed/INbgG9M0WYE" },
+      { title: "Veridis Quo", url: "https://www.youtube.com/embed/TCd6PfxOy0Y" },
+      { title: "Short Circuit", url: "https://www.youtube.com/embed/9hhVnRTNVmM" },
+      { title: "Face to Face", url: "https://www.youtube.com/embed/UKYWWfR_GKA" },
+      { title: "Too Long", url: "https://www.youtube.com/embed/ROF4uNjrB4U" }
+    ]
+  },
+  {
+    name: "Human After All",
+    cover: "human_after_all.png",
+    songs: [
+      { title: "Human After All", url: "https://www.youtube.com/embed/PXYeARRyDWk" },
+      { title: "The Prime Time Of Your Life", url: "https://www.youtube.com/embed/QwRlt1XyOg0" },
+      { title: "Robot Rock", url: "https://www.youtube.com/embed/sFZjqVnWBhc" },
+      { title: "Steam Machine", url: "https://www.youtube.com/embed/0sa2R-PM0Uk" },
+      { title: "Make Love", url: "https://www.youtube.com/embed/UeZG0viNAjM" },
+      { title: "The Brainwasher", url: "https://www.youtube.com/embed/RdVEQbWjaTE" },
+      { title: "On/Off", url: "https://www.youtube.com/embed/xf5kjtSW1aM" },
+      { title: "Television Rules the Nation", url: "https://www.youtube.com/embed/StACmxSQKY8" },
+      { title: "Technologic", url: "https://www.youtube.com/embed/D8K90hX4PrE" },
+      { title: "Emotion", url: "https://www.youtube.com/embed/d-OGBZSDKBU" }
+    ]
+  },
+  {
+    name: "Alive 2007",
+    cover: "alive_2007.png",
+    songs: [
+      { title: "Robot Rock / Oh Yeah", url: "https://www.youtube.com/embed/lVKbF8khsrI" },
+      { title: "Touch It / Technologic", url: "https://www.youtube.com/embed/NFxyYYRqobw" },
+      { title: "Television Rules the Nation / Crescendolls", url: "https://www.youtube.com/embed/Hg3G1E2tNCA" },
+      { title: "Too Long / Steam Machine", url: "https://www.youtube.com/embed/l4SFUztLWOA" },
+      { title: "Around the World / Harder, Better, Faster, Stronger", url: "https://www.youtube.com/embed/0fllyJTBsRU" },
+      { title: "Burnin' / Too Long", url: "https://www.youtube.com/embed/USpepfrrCNs" },
+      { title: "Face to Face / Short Circuit", url: "https://www.youtube.com/embed/ZXhwXhv37Ps" },
+      { title: "One More Time / Aerodynamic", url: "https://www.youtube.com/embed/evqx5HLm9iM" },
+      { title: "Aerodynamic Beats / Forget About the World", url: "https://www.youtube.com/embed/TycgkK2gFvA" },
+      { title: "The Prime Time of Your Life/The Brainwasher/Rollin'/Alive", url: "https://www.youtube.com/embed/3AsRI_cSie0" },
+      { title: "Da Funk / Daftendirekt", url: "https://www.youtube.com/embed/Im6Fsd92n3k" },
+      { title: "Superheroes / Human After All / Rock'n Roll", url: "https://www.youtube.com/embed/Kccj6KPAKcE" },
+      { title: "Human After All / Together / One More Time / Music Sounds", url: "https://www.youtube.com/embed/uOdm7-YMoUU" }
+    ]
+  },
+  {
+    name: "Random Access Memories",
+    cover: "ram.png",
+    songs: [
+      { title: "Give Life Back to Music", url: "https://www.youtube.com/embed/zKSsP2084nU" },
+      { title: "The Game of Love", url: "https://www.youtube.com/embed/_vOcbrUsmjM" },
+      { title: "Giorgio by Moroder", url: "https://www.youtube.com/embed/ZFZM6jDTWd4" },
+      { title: "Within", url: "https://www.youtube.com/embed/iNjGNNoUjkk" },
+      { title: "Instant Crush", url: "https://www.youtube.com/embed/khnokW3Mw24" },
+      { title: "Lose Yourself to Dance", url: "https://www.youtube.com/embed/iU7oF4OXZSE" },
+      { title: "Touch", url: "https://www.youtube.com/embed/RRMbhEdmhYw" },
+      { title: "Get Lucky", url: "https://www.youtube.com/embed/4D7u5KF7SP8" },
+      { title: "Beyond", url: "https://www.youtube.com/embed/RE_XX6jk2Lo" },
+      { title: "Motherboard", url: "https://www.youtube.com/embed/3x-Q-iRvib4" },
+      { title: "Fragments of Time", url: "https://www.youtube.com/embed/3rpQTqpFTF4" },
+      { title: "Doin' it Right", url: "https://www.youtube.com/embed/wmSkU6R9Zi8" },
+      { title: "Contact", url: "https://www.youtube.com/embed/UoF1dFWKsVk" }
+    ]
+  }
+];
+
+// ===== Helper Functions =====
+
+// Show the list of albums
+function showAlbumSelection() {
+  albumSelection.innerHTML = "";
+  musicPlayerContainer.style.display = "block";
+  albumPlayer.style.display = "none";
+
+  albums.forEach((album, index) => {
+    const btn = document.createElement("button");
+    btn.textContent = album.name;
+    btn.className = "btn";
+    btn.onclick = () => selectAlbum(index);
+    albumSelection.appendChild(btn);
+  });
+}
+
+// Select an album and show its songs
+function selectAlbum(index) {
+  currentAlbum = albums[index];
+  currentSongIndex = 0;
+  albumSelection.style.display = "none";
+  albumPlayer.style.display = "flex"; // show album player container
+	
+  const albumCover = document.getElementById("albumCover");
+albumCover.src = currentAlbum.cover;
+albumCover.alt = currentAlbum.name;
+  loadSongList();
+  loadSong(currentSongIndex);
+}
+
+// Load song list on the right side
+
+
+let popupWindow = null; // keeps track of the single popup
+
+function loadSongList() {
+  songList.innerHTML = "";
+  currentAlbum.songs.forEach((song, i) => {
+    const sBtn = document.createElement("div");
+    sBtn.textContent = song.title; // show correct title
+    sBtn.className = "song-item";
+    sBtn.style.cursor = "pointer";
+    sBtn.style.padding = "4px";
+    sBtn.style.borderBottom = "1px solid #444";
+
+    sBtn.onclick = () => {
+const videoId = song.url.split("/embed/")[1];
+const videoURL = "https://music.youtube.com/watch?v=" + videoId;
+
+
+      // If popup exists and is still open, navigate it to the new video
+      if (popupWindow && !popupWindow.closed) {
+        popupWindow.location.href = videoURL;
+        popupWindow.focus();
+      } else {
+        // Otherwise, open a new popup
+        popupWindow = window.open(
+          videoURL,
+          "ytPopup",
+          "width=640,height=360,resizable=yes,scrollbars=no"
+        );
+      }
+    };
+
+    songList.appendChild(sBtn);
+  });
+}
+
+
+
+// Load a song into the embedded player
+
+
+
+
+// Back button to album selection
+backBtn.onclick = () => {
+  albumSelection.style.display = "block";
+  albumPlayer.style.display = "none";
+  currentAlbum = null;
+};
+
+// Toggle music player visibility
+
+
+// Show albums on page load
+showAlbumSelection();
+
 
 </script>
 </body>
