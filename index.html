@@ -1,122 +1,118 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Daft Punk Pixel Counter</title>
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 <style>
-:root {
-  --bg: #101010;
-  --panel: #1c1c1c;
-  --accent: #ff006e;
-  --accent2: #00ffff;
-  --ink: #fff;
+:root{
+  --bg:#0b0b0b;
+  --panel:#141414;
+  --accent:#ff006e;
+  --accent2:#00ffff;
+  --ink:#ffffff;
+  --muted:#9bd;
+  --glass: rgba(255,255,255,0.03);
 }
 
-html,body {
-  margin:0;
-  height:100%;
-  font-family:"Press Start 2P",monospace;
-  background:var(--bg);
-  color:var(--ink);
+/* Reset & base */
+*{box-sizing:border-box}
+html,body{height:100%;margin:0;background:var(--bg);color:var(--ink);font-family:"Press Start 2P",monospace; -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;}
+button{font-family:inherit}
+a{color:inherit;text-decoration:none}
+
+/* Layout */
+.container{
+  width:calc(100% - 32px);
+  max-width:1200px;
+  margin:20px auto;
+  display:grid;
+  grid-template-columns:360px 1fr;
+  gap:18px;
+  align-items:start;
+  padding:18px;
+  border:4px solid #fff;
+  background:#000;
+  border-radius:8px;
+}
+
+/* responsive: stack on small screens */
+@media (max-width:880px){
+  .container { grid-template-columns: 1fr; padding:12px; gap:12px; width:calc(100% - 24px); margin:12px; }
+  .header .title{font-size:10px}
+}
+
+/* header */
+.header{
+  grid-column:1/-1;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:8px;
+  background:var(--panel);
+  border:3px solid #fff;
+}
+.header .title{font-size:12px}
+.header .sub{font-size:9px; opacity:0.9}
+
+/* left panel: controls */
+.left{
+  background:var(--panel);
+  border:3px solid #fff;
+  padding:12px;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  min-height:220px;
+}
+
+/* small labels & inputs */
+.controls { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+.controls label{font-size:9px}
+.controls input[type=number]{
+  appearance:none;
+  background:#000; color:#0f0; border:2px solid #0f0; padding:6px; width:90px; font-size:11px; font-family:inherit;
+}
+
+/* Buttons row */
+.row { display:flex; gap:8px; flex-wrap:wrap; }
+.btn{
+  background:var(--accent); color:#fff; border:2px solid #fff; padding:8px 10px; font-size:11px; cursor:pointer;
+  min-width:84px; text-align:center;
+}
+.btn.secondary{background:var(--accent2); color:#000}
+.btn.ghost{background:transparent}
+.btn:disabled{opacity:0.45; cursor:default; transform:none}
+
+/* Stat boxes */
+.stat{ background:#000; border:2px solid #fff; padding:8px; font-size:11px; color:#0f0; }
+.stat-row{display:flex; gap:8px; flex-wrap:wrap; align-items:center}
+
+/* progress */
+.progress{ margin-top:6px; background:#111; border:2px solid #fff; height:18px; overflow:hidden; width:100%;}
+.progress > i{ display:block; height:100%; background:#0f0; width:0%; transition:width .3s ease; }
+
+/* log */
+.log{ background:#0a0a0a; color:#0ff; border:2px solid #fff; padding:8px; font-size:10px; height:120px; overflow:auto; }
+
+/* right panel: stage & extras */
+.stage{
+  position:relative;
+  overflow:hidden;
+  height:420px;
+  border:3px solid #fff;
+  background:#000;
   display:flex;
   align-items:center;
   justify-content:center;
+  position: relative;
+  overflow: hidden;
+
 }
 
-.app {
-  display:grid;
-  grid-template-columns:320px 1fr;
-  gap:20px;
-  border:4px solid #fff;
-  background:#000;
-  padding:20px;
-  width:960px;
-  max-width:calc(100% - 40px);
-}
-
-.header {
-  grid-column:1/-1;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  background:var(--panel);
-  padding:8px;
-  border:3px solid #fff;
-}
-
-.left {
-  background:var(--panel);
-  border:3px solid #fff;
-  padding:10px;
-}
-
-h3 {font-size:10px;margin:8px 0;}
-
-input[type="number"] {
-  background:#000;
-  color:#0f0;
-  border:2px solid #0f0;
-  font-family:inherit;
-  font-size:10px;
-  padding:4px;
-  width:70px;
-}
-
-.btn {
-  background:var(--accent);
-  border:2px solid #fff;
-  color:#fff;
-  font-family:inherit;
-  font-size:10px;
-  padding:6px 10px;
-  cursor:pointer;
-}
-.btn:disabled{opacity:0.5;cursor:default;}
-.stat {
-  border:2px solid #fff;
-  margin-top:6px;
-  padding:4px;
-  background:#000;
-  color:#0f0;
-  font-size:10px;
-}
-.progress {
-  margin-top:8px;
-  background:#222;
-  border:2px solid #fff;
-  height:16px;
-  overflow:hidden;
-}
-.progress>i {
-  display:block;
-  height:100%;
-  background:#0f0;
-  width:0%;
-  transition:width .3s;
-}
-.log {
-  font-size:8px;
-  background:#111;
-  color:#0ff;
-  border:2px solid #fff;
-  padding:6px;
-  margin-top:10px;
-  height:120px;
-  overflow:auto;
-}
-
-/* ====== Right Panel: DAFT PUNK Logo + Starfield ====== */
-.stage {
-  position:relative;
-  overflow:hidden;
-  height:400px;
-  border:3px solid #fff;
-  background:#000;
-}
-
-.logo-image {
+/* logo position */
+.logo-image{
   position:absolute;
   top:50%;
   left:50%;
@@ -126,220 +122,803 @@ input[type="number"] {
   animation:pulse 2s infinite alternate;
   image-rendering:pixelated;
 }
-@keyframes pulse {
-  from { filter: drop-shadow(0 0 4px var(--accent2)); }
-  to { filter: drop-shadow(0 0 16px var(--accent)); }
-}
+@keyframes pulse { from{ filter: drop-shadow(0 0 4px var(--accent2)); } to{ filter: drop-shadow(0 0 16px var(--accent)); } }
 
-/* Stars */
-.star {
-  position:absolute;
-  background:#fff;
-  width:2px;
-  height:2px;
-  opacity:0.8;
-}
+/* stars */
+.star{ position:absolute; width:2px; height:2px; background:#fff; opacity:0.8; }
 
-/* DVD Toggle Button */
-.dvd-toggle {
-  position:absolute;
-  bottom:10px;
-  right:10px;
-  font-size:8px;
-  background:var(--accent2);
-  border:2px solid #fff;
-  color:#000;
-  padding:6px 8px;
-  cursor:pointer;
-  font-family:inherit;
-}
+/* dvd toggle */
+.dvd-toggle{ position:absolute; bottom:12px; right:12px; font-size:10px; background:var(--accent2); border:2px solid #fff; color:#000; padding:6px 8px; cursor:pointer; }
 
-/* ===== Soundboard ===== */
-.soundboard {
-  grid-column:1/-1;
-  display:flex;
-  flex-wrap:wrap;
-  justify-content:center;
-  gap:10px;
-  margin-top:10px;
-}
+/* soundboard */
+.soundboard{ grid-column:1/-1; display:flex; gap:10px; flex-wrap:wrap; justify-content:center; margin-top:10px; }
+.sound-btn{ font-family:inherit; font-size:10px; padding:10px; background:var(--accent); border:2px solid #fff; color:#fff; cursor:pointer; min-width:110px; text-align:center; }
+.sound-btn.active{ background:var(--accent2); color:#000; transform:scale(1.05); }
 
-.sound-btn {
-  font-family:"Press Start 2P",monospace;
-  font-size:8px;
-  padding:10px;
-  background:#ff006e;
-  border:2px solid #fff;
-  color:#fff;
-  cursor:pointer;
-  min-width:100px;
-  text-align:center;
-  transition:transform 0.1s;
-}
+/* music player container */
+.music-container{ grid-column:1/-1; margin-top:10px; background:#111; border:3px solid #fff; padding:10px; display:flex; gap:12px; flex-wrap:wrap; align-items:flex-start; }
 
-.sound-btn.active {
-  background:#00ffff;
-  color:#000;
-  transform:scale(1.05);
-}
+/* album list / player */
+.album-list{ display:flex; gap:8px; flex-wrap:wrap; }
+.album-list .album-btn{ padding:8px 10px; border:2px solid #fff; background:#000; color:#fff; cursor:pointer; font-size:11px; }
+.album-player{ display:flex; gap:12px; align-items:flex-start; width:100%; flex-wrap:wrap; }
+.song-item{ padding:8px; border-bottom:1px solid #333; cursor:pointer; font-size:11px; }
 
-/* ===== Focus Mode Overlay ===== */
-.focus-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.95);
-  color: #0f0;
-  display: none;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  z-index: 9999;
-  text-align: center;
+/* Focus Mode full screen overlay (applies when body has .in-focus) */
+.focus-overlay{
+  position:fixed; top:0; left:0; width:100vw; height:100vh; z-index:9999; background:#000; display:flex; align-items:center; justify-content:center; flex-direction:column;
 }
+.focus-inner{ display:flex; flex-direction:column; align-items:center; justify-content:center; gap:14px; width:100%; padding:30px; box-sizing:border-box; }
 
-.focus-overlay h1 {
-  font-size: 18px;
-  margin-bottom: 20px;
-}
+/* scale the stat & progress for focus */
+.focus-inner .stat{ transform:scale(1.5); padding:14px; font-size:18px; border-width:3px }
+.focus-inner .progress{ width:80%; height:26px; border-width:3px }
 
-.focus-overlay .big-count {
-  font-size: 36px;
-  margin: 10px 0;
-  color: #0f0;
-}
-
-.focus-overlay .big-progress {
-  width: 80%;
-  height: 20px;
-  background: #222;
-  border: 2px solid #fff;
-  margin-top: 20px;
-  position: relative;
-}
-
-.focus-overlay .big-progress-fill {
-  position: absolute;
-  top: 0;
-  left: 0;
-  height: 100%;
-  background: #0f0;
-  width: 0%;
-  transition: width 0.3s;
-}
-
-.focus-btn {
-  background: var(--accent);
-  border: 2px solid #fff;
-  color: #fff;
-  font-family: inherit;
-  font-size: 10px;
-  padding: 6px 10px;
-  cursor: pointer;
-  margin-top: 20px;
+/* small-screen specific tweaks */
+@media (max-width:600px){
+  .left{ padding:10px }
+  .controls input[type=number]{ width:80px; padding:8px }
+  .btn{ padding:8px 8px; min-width:70px; font-size:10px }
+  .logo-image{ max-width:65% }
+  .stage{height:260px}
+  .log{ height:90px }
 }
 </style>
 </head>
 <body>
-<div class="app">
+
+<!-- MAIN APP -->
+<div class="container" id="app">
   <div class="header">
-    <div>DAFT PUNK PIXEL COUNTER</div>
-    <div style="font-size:8px">HARDER • BETTER • FASTER • STRONGER</div>
+    <div>
+      <div class="title">DAFT PUNK PIXEL COUNTER</div>
+      <div class="sub">HARDER • BETTER • FASTER • STRONGER</div>
+    </div>
+    <div style="display:flex; gap:8px; align-items:center;">
+      <div style="font-size:10px; color:#fff; opacity:0.9;">Rieth's Counter</div>
+      <button id="focusBtn" class="btn">FOCUS MODE</button>
+    </div>
   </div>
 
-  <div class="left">
-    <h3>Session</h3>
+  <!-- LEFT: controls & stats -->
+  <div class="left" id="leftPanel">
     <div>
-      <label>Start</label>
-      <input id="startCount" type="number" value="0" min="0">
-      <label>Goal</label>
-      <input id="goalCount" type="number" value="10" min="1">
+      <h3 style="margin:0 0 8px 0; font-size:12px;">Session</h3>
+      <div class="controls">
+        <label>Start</label>
+        <input id="startCount" type="number" value="0" min="0" />
+        <label>Goal</label>
+        <input id="goalCount" type="number" value="10" min="1" />
+      </div>
     </div>
 
-    <div style="margin-top:10px; display:flex; flex-wrap:wrap; gap:8px;">
+    <div class="row" style="margin-top:8px;">
       <button id="startBtn" class="btn">START</button>
       <button id="pauseBtn" class="btn" disabled>PAUSE</button>
       <button id="restartBtn" class="btn" disabled>RESTART</button>
-      <button id="incrementBtn" class="btn" disabled>+1</button>
-      <button id="clearBtn" class="btn">CLEAR VALUES</button>
-      <button id="focusBtn" class="btn" style="background:var(--accent2);color:#000;">FOCUS MODE</button>
+      <button id="clearBtn" class="btn ghost">CLEAR</button>
     </div>
 
-    <div class="stat">Count: <span id="countDisplay">0</span></div>
-    <div class="stat">Total: <span id="totalTime">0.00s</span></div>
-    <div class="stat">Increment: <span id="incrementTime">0.00s</span></div>
-    <div class="stat">Average: <span id="avgTime">0.00s</span></div>
+    <div class="row" style="margin-top:6px;">
+      <button id="decrementBtn" class="btn secondary" disabled>-1</button>
+      <button id="incrementBtn" class="btn" disabled>+1</button>
+    </div>
 
-    <div class="progress"><i id="progressFill"></i></div>
-    <div style="font-size:10px;margin-top:6px;">Progress: <span id="percentDisplay">0%</span></div>
+    <div style="margin-top:8px; display:flex; gap:8px; flex-wrap:wrap;">
+      <div class="stat">Count: <span id="countDisplay">0</span></div>
+      <div class="stat">Goal: <span id="goalDisplay">10</span></div>
+      <div class="stat">Progress: <span id="percentDisplay">0%</span></div>
+    </div>
 
-    <div class="log" id="log"></div>
+    <div style="margin-top:8px;">
+      <div class="stat">Total: <span id="totalTime">0.00s</span></div>
+      <div class="stat">Increment: <span id="incrementTime">0.00s</span></div>
+      <div class="stat">Average: <span id="avgTime">0.00s</span></div>
+      <div class="stat">Estimated to Goal: <span id="etaTime">--</span></div>
+    </div>
+
+    <div style="width:100%; margin-top:8px;">
+      <div class="progress"><i id="progressFill"></i></div>
+    </div>
+
+    <div style="margin-top:10px;">
+      <div class="log" id="log"></div>
+    </div>
   </div>
 
+  <!-- RIGHT: visual stage -->
   <div class="stage" id="stage">
-    <img src="daftpunk.png" alt="Daft Punk Logo" id="logo" class="logo-image">
-    <button class="dvd-toggle" id="dvdToggle">DVD MODE</button>
+    <img src="daftpunk.png" alt="Daft Punk Logo" id="logo" class="logo-image" />
+    <button id="dvdToggle" class="dvd-toggle">DVD MODE</button>
   </div>
 
-  <!-- Soundboard -->
+  <!-- soundboard (spans full width) -->
   <div class="soundboard" id="soundboard"></div>
 
-  <!-- Music Player -->
-  <div id="musicPlayerContainer" style="display:block; grid-column:1/-1; margin-top:10px; background:#111; border:3px solid #fff; padding:10px;">
-    <div id="albumSelection" style="display:flex; flex-wrap:wrap; gap:10px;"></div>
-    <div id="albumPlayer" style="display:none; flex-wrap:wrap; gap:20px;">
-      <div style="flex:1; min-width:300px;">
-        <img id="albumCover" src="" alt="Album Cover" style="width:100%; max-width:300px; margin-bottom:10px; border:3px solid #fff; border-radius:8px;">
-        <div id="playerEmbed"></div>
-        <button class="btn" id="backBtn" style="margin-top:10px;">BACK TO ALBUMS</button>
-      </div>
-      <div style="flex:1; min-width:200px; max-height:400px; overflow:auto;" id="songList"></div>
-    </div>
-  </div>
+  <!-- music player area -->
+  <div class="music-container" id="musicPlayerContainer">
+    <div id="albumSelection" class="album-list"></div>
 
-  <!-- Focus Overlay -->
-  <div class="focus-overlay" id="focusOverlay">
-    <h1>FOCUS MODE</h1>
-    <div class="big-count">Count: <span id="focusCount">0</span></div>
-    <div class="big-progress"><div class="big-progress-fill" id="focusProgressFill"></div></div>
-    <button class="focus-btn" id="exitFocusBtn">EXIT FOCUS</button>
+    <div id="albumPlayer" class="album-player" style="display:none; flex:1;">
+      <div style="min-width:220px;">
+        <img id="albumCover" src="" alt="Album Cover" style="width:100%; max-width:260px; border:3px solid #fff; border-radius:6px;" />
+        <div id="playerEmbed" style="margin-top:8px;"></div>
+        <button id="backBtn" class="btn" style="margin-top:10px;">BACK</button>
+      </div>
+      <div id="songList" style="flex:1; max-height:300px; overflow:auto;"></div>
+    </div>
   </div>
 </div>
 
+<!-- Focus overlay (hidden until used) -->
+<div id="focusOverlay" style="display:none;"></div>
+
 <script>
-/* Starfield + Counter Logic + Music Player remain unchanged — skipping for brevity,
-   only Focus Mode JS appended at bottom of your existing <script> */
+/* ============================
+   Starfield + Logo DVD Setup
+   ============================ */
+const stage = document.getElementById('stage');
+const logo = document.getElementById('logo');
+const stageRect = stage.getBoundingClientRect();
+let width = stage.offsetWidth;
+let height = stage.offsetHeight;
+window.addEventListener('resize', () => {
+  width = stage.offsetWidth;
+  height = stage.offsetHeight;
+});
 
-const focusBtn = document.getElementById("focusBtn");
-const focusOverlay = document.getElementById("focusOverlay");
-const exitFocusBtn = document.getElementById("exitFocusBtn");
-const focusCount = document.getElementById("focusCount");
-const focusProgressFill = document.getElementById("focusProgressFill");
+const starCount = 120;
+const stars = [];
+for(let i=0;i<starCount;i++){
+  const s = document.createElement('div');
+  s.className='star';
+  stage.appendChild(s);
+  stars.push({el:s, x: Math.random()*width - width/2, y: Math.random()*height - height/2, z: Math.random()*1000+1});
+}
+function animateStars(){
+  const centerX = width/2, centerY = height/2;
+  for(const star of stars){
+    star.z -= 10;
+    if(star.z <= 1){
+      star.x = Math.random()*width - width/2;
+      star.y = Math.random()*height - height/2;
+      star.z = 1000;
+    }
+    const k = 128.0 / star.z;
+    const px = star.x * k + centerX;
+    const py = star.y * k + centerY;
+    star.el.style.left = px + 'px';
+    star.el.style.top = py + 'px';
+    const scale = (1 - star.z/1000) * 3;
+    star.el.style.width = scale + 'px';
+    star.el.style.height = scale + 'px';
+    star.el.style.opacity = 1 - star.z/1000;
+  }
+  requestAnimationFrame(animateStars);
+}
+animateStars();
 
-function updateFocusDisplay() {
-  focusCount.textContent = currentCount;
-  const percent = ((currentCount - startCount) / (goalCount - startCount)) * 100;
-  focusProgressFill.style.width = Math.min(percent, 100) + "%";
+/* DVD mode bounce */
+let dvdMode = false, dx = 5, dy = 4, x = width/2, y = height/2; logo.style.transform = "translate(-50%, -50%)";
+
+const dvdToggle = document.getElementById('dvdToggle');
+function animateDVD() {
+  if (!dvdMode) return;
+
+  const stageRect = stage.getBoundingClientRect();
+  const lw = logo.clientWidth;
+  const lh = logo.clientHeight;
+
+  x += dx;
+  y += dy;
+
+if (x - lw/2 <= 0 || x + lw/2 >= stageRect.width) dx *= -1;
+if (y - lh/2 <= 0 || y + lh/2 >= stageRect.height) dy *= -1;
+
+logo.style.left = x + 'px';
+logo.style.top = y + 'px';
+logo.style.transform = "translate(-50%, -50%)";
+
+
+  requestAnimationFrame(animateDVD);
 }
 
+dvdToggle.onclick = () => {
+  dvdMode = !dvdMode;
+  if(dvdMode){
+    dvdToggle.textContent = 'STOP DVD';
+    logo.style.animation = 'none';
+    logo.style.transform = 'translate(0,0)';
+    x = width/2; y = height/2;
+    animateDVD();
+  } else {
+    dvdToggle.textContent = 'DVD MODE';
+    logo.style.top = '50%';
+    logo.style.left = '50%';
+    logo.style.transform = 'translate(-50%,-50%)';
+    logo.style.animation = 'pulse 2s infinite alternate';
+  }
+};
+
+/* ============================
+   Counter logic + UI wiring
+   ============================ */
+
+/* State */
+let startCount = 0, goalCount = 10, currentCount = 0;
+let startTime = 0, lastInc = 0, paused = false;
+let times = []; // holds seconds between increments (for avg and ETA)
+
+let totalTimer = null, incTimer = null;
+let isFocus = false;
+
+/* Elements */
+const startInput = document.getElementById('startCount');
+const goalInput = document.getElementById('goalCount');
+const startBtn = document.getElementById('startBtn');
+const pauseBtn = document.getElementById('pauseBtn');
+const restartBtn = document.getElementById('restartBtn');
+const clearBtn = document.getElementById('clearBtn');
+const incBtn = document.getElementById('incrementBtn');
+const decBtn = document.getElementById('decrementBtn');
+
+const countDisplay = document.getElementById('countDisplay');
+const goalDisplay = document.getElementById('goalDisplay');
+const totalTimeDisplay = document.getElementById('totalTime');
+const incrementTimeDisplay = document.getElementById('incrementTime');
+const avgTimeDisplay = document.getElementById('avgTime');
+const etaTimeDisplay = document.getElementById('etaTime');
+const progressFill = document.getElementById('progressFill');
+const percentDisplay = document.getElementById('percentDisplay');
+const log = document.getElementById('log');
+
+const focusBtn = document.getElementById('focusBtn');
+const focusOverlayContainer = document.getElementById('focusOverlay');
+const appContainer = document.getElementById('app');
+
+/* Save / Load state */
+function saveState(){
+  const payload = { startCount, goalCount, currentCount, times };
+  try{ localStorage.setItem('daftPixelCounter', JSON.stringify(payload)); } catch(e){}
+}
+function loadState(){
+  try{
+    const raw = localStorage.getItem('daftPixelCounter');
+    if(!raw) return;
+    const s = JSON.parse(raw);
+    if(typeof s.startCount === 'number') startCount = s.startCount;
+    if(typeof s.goalCount === 'number') goalCount = s.goalCount;
+    if(typeof s.currentCount === 'number') currentCount = s.currentCount;
+    times = Array.isArray(s.times) ? s.times : [];
+    startInput.value = startCount;
+    goalInput.value = goalCount;
+    countDisplay.textContent = currentCount;
+    goalDisplay.textContent = goalCount;
+    updateProgress();
+    updateETA();
+  } catch(e){}
+}
+loadState();
+
+/* Utilities */
+function clamp(v, a, b){ return Math.max(a, Math.min(b, v)); }
+function formatSecs(s){
+  if(typeof s !== 'number' || !isFinite(s)) return '--';
+  if(s <= 0) return '0.00s';
+  if(s >= 60){
+    const m = Math.floor(s/60);
+    const sec = (s - m*60).toFixed(0);
+    return `${m}m ${sec}s`;
+  }
+  return s.toFixed(2) + 's';
+}
+
+/* Start session */
+function startSession(){
+  startCount = Number(startInput.value) || 0;
+  goalCount = Math.max(1, Number(goalInput.value) || 1);
+  currentCount = startCount;
+  startInput.value = startCount;
+  goalInput.value = goalCount;
+  times = [];
+  paused = false;
+  startTime = Date.now();
+  lastInc = Date.now();
+  countDisplay.textContent = currentCount;
+  goalDisplay.textContent = goalCount;
+  log.innerHTML = '';
+  updateProgress();
+  updateETA();
+  startBtn.disabled = true;
+  incBtn.disabled = false;
+  decBtn.disabled = true; // cannot dec below start yet
+  pauseBtn.disabled = false;
+  restartBtn.disabled = false;
+
+  // clear timers then start regular update timers (these update displays only if not paused and not focus)
+  if(totalTimer) clearInterval(totalTimer);
+  if(incTimer) clearInterval(incTimer);
+  totalTimer = setInterval(()=> {
+    if(!paused && !isFocus){
+      totalTimeDisplay.textContent = ((Date.now() - startTime)/1000).toFixed(2) + 's';
+    }
+  }, 100);
+  incTimer = setInterval(()=> {
+    if(!paused && !isFocus){
+      incrementTimeDisplay.textContent = ((Date.now() - lastInc)/1000).toFixed(2) + 's';
+    }
+  }, 100);
+
+  saveState();
+}
+
+/* Update progress bar & displays */
+function updateProgress(){
+  goalDisplay.textContent = goalCount;
+  const percent = goalCount === startCount ? 100 : ((currentCount - startCount) / (goalCount - startCount)) * 100;
+  const clamped = clamp(percent, 0, 100);
+  progressFill.style.width = clamped + '%';
+  percentDisplay.textContent = Math.round(clamped) + '%';
+  countDisplay.textContent = currentCount;
+  // update average
+  const avg = times.length ? (times.reduce((a,b)=>a+b,0) / times.length) : 0;
+  avgTimeDisplay.textContent = avg ? avg.toFixed(2) + 's' : '0.00s';
+  // enable dec button if meaningful
+  decBtn.disabled = currentCount <= startCount;
+}
+
+/* Update ETA based on average */
+function updateETA(){
+  if(times.length === 0){
+    etaTimeDisplay.textContent = '--';
+    return;
+  }
+  const avg = times.reduce((a,b)=>a+b,0) / times.length;
+  const remaining = Math.max(0, goalCount - currentCount);
+  const estimated = remaining * avg;
+  etaTimeDisplay.textContent = formatSecs(estimated);
+}
+
+/* +1 handler: records delta time, updates counters and ETA */
+function increment(){
+  const now = Date.now();
+  const delta = (now - lastInc) / 1000;
+  // record delta (do not record if paused? user expects pressing +1 in focus counts — we still record)
+  times.push(delta);
+  lastInc = now;
+  currentCount++;
+  const li = document.createElement('div');
+  li.textContent = `+1 after ${delta.toFixed(2)}s`;
+  log.prepend(li);
+  updateProgress();
+  updateETA();
+  saveState();
+  // if reached goal
+  if(currentCount >= goalCount){
+    incBtn.disabled = true;
+    pauseBtn.disabled = true;
+    if(totalTimer) clearInterval(totalTimer);
+    if(incTimer) clearInterval(incTimer);
+    const msg = document.createElement('div');
+    msg.textContent = 'GOAL REACHED! ★';
+    log.prepend(msg);
+    etaTimeDisplay.textContent = 'Goal reached!';
+  } else {
+    // keep dec enabled since we've incremented past start
+    decBtn.disabled = currentCount <= startCount;
+  }
+}
+
+/* -1 handler: decrements count (does NOT add a time entry) */
+function decrement(){
+  if(currentCount <= startCount) return;
+  currentCount--;
+  const li = document.createElement('div');
+  li.textContent = `-1 (manual)`;
+  log.prepend(li);
+  updateProgress();
+  updateETA();
+  saveState();
+  incBtn.disabled = false;
+  decBtn.disabled = currentCount <= startCount;
+}
+
+/* Pause toggle */
+function pauseToggle(){
+  paused = !paused;
+  pauseBtn.textContent = paused ? 'RESUME' : 'PAUSE';
+  saveState();
+}
+
+/* Restart (reset timers but keep start/goal values) */
+function restartSession(){
+  if(totalTimer) clearInterval(totalTimer);
+  if(incTimer) clearInterval(incTimer);
+  paused = false;
+  startBtn.disabled = false;
+  incBtn.disabled = true;
+  decBtn.disabled = true;
+  pauseBtn.disabled = true;
+  restartBtn.disabled = true;
+  totalTimeDisplay.textContent = '0.00s';
+  incrementTimeDisplay.textContent = '0.00s';
+  avgTimeDisplay.textContent = '0.00s';
+  etaTimeDisplay.textContent = '--';
+  log.innerHTML = '';
+  times = [];
+  currentCount = startCount;
+  countDisplay.textContent = currentCount;
+  updateProgress();
+  saveState();
+}
+
+/* Clear storage and reload */
+function clearValues(){
+  try{ localStorage.removeItem('daftPixelCounter'); } catch(e){}
+  location.reload();
+}
+
+/* Event wiring */
+startBtn.onclick = startSession;
+incBtn.onclick = increment;
+decBtn.onclick = decrement;
+pauseBtn.onclick = pauseToggle;
+restartBtn.onclick = restartSession;
+clearBtn.onclick = clearValues;
+
+/* start/goal input changes update internal values */
+startInput.onchange = () => {
+  const v = Number(startInput.value) || 0;
+  startCount = v;
+  // clamp current if below new start
+  if(currentCount < startCount) currentCount = startCount;
+  countDisplay.textContent = currentCount;
+  updateProgress();
+  updateETA();
+  saveState();
+};
+goalInput.onchange = () => {
+  const v = Math.max(1, Number(goalInput.value) || 1);
+  goalCount = v;
+  goalDisplay.textContent = goalCount;
+  updateProgress();
+  updateETA();
+  saveState();
+};
+
+/* Load initial UI state */
+updateProgress();
+updateETA();
+
+/* ============================
+   Focus Mode Implementation
+   ============================ */
+function enterFocusMode(){
+  // build overlay content
+  isFocus = true;
+  // pause time-driven visuals (timers check isFocus)
+  // create overlay
+  const overlay = document.createElement('div');
+  overlay.className = 'focus-overlay';
+  overlay.id = 'focusOverlayInner';
+  overlay.innerHTML = `
+    <div class="focus-inner">
+      <div class="stat">Count: <span id="focusCount">${currentCount}</span></div>
+      <div class="stat">Progress: <span id="focusPercent">${percentDisplay.textContent}</span></div>
+      <div class="progress"><i id="focusProgressFill" style="width:${progressFill.style.width}"></i></div>
+      <div style="display:flex; gap:14px;">
+        <button id="focusDec" class="btn secondary">-1</button>
+        <button id="focusInc" class="btn">+1</button>
+      </div>
+      <div style="display:flex; gap:8px;">
+        <div class="stat">Average: <span id="focusAvg">${avgTimeDisplay.textContent}</span></div>
+        <div class="stat">ETA: <span id="focusETA">${etaTimeDisplay.textContent}</span></div>
+      </div>
+      <div style="margin-top:8px;"><button id="exitFocus" class="btn ghost">EXIT FOCUS</button></div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+
+  // hide non-essential UI in main app
+  document.getElementById('stage').style.display = 'none';
+  document.getElementById('soundboard').style.display = 'none';
+  document.getElementById('musicPlayerContainer').style.display = 'none';
+  // request fullscreen
+  if(document.documentElement.requestFullscreen) document.documentElement.requestFullscreen().catch(()=>{});
+  focusBtn.textContent = 'EXIT FOCUS';
+
+  // update overlay values initially
+  document.getElementById('focusCount').textContent = currentCount;
+  document.getElementById('focusPercent').textContent = percentDisplay.textContent;
+
+  // attach handlers for overlay buttons
+  const fInc = document.getElementById('focusInc');
+  const fDec = document.getElementById('focusDec');
+  const fExit = document.getElementById('exitFocus');
+  const fProgressFill = document.getElementById('focusProgressFill');
+
+  // when in focus, timers should not auto-update displays (they still run but checks isFocus)
+  fInc.onclick = () => {
+    // record increment as normal
+    const now = Date.now();
+    const delta = (now - lastInc) / 1000;
+    times.push(delta);
+    lastInc = now;
+    currentCount++;
+    // update main UI and overlay synchronously
+    updateProgress();
+    updateETA();
+    document.getElementById('focusCount').textContent = currentCount;
+    document.getElementById('focusPercent').textContent = percentDisplay.textContent;
+    fProgressFill.style.width = progressFill.style.width;
+    // also update focus avg/eta
+    document.getElementById('focusAvg').textContent = avgTimeDisplay.textContent;
+    document.getElementById('focusETA').textContent = etaTimeDisplay.textContent;
+    // log
+    const li = document.createElement('div'); li.textContent = `+1 after ${delta.toFixed(2)}s`; log.prepend(li);
+    saveState();
+    // if reached goal disable inc
+    if(currentCount >= goalCount){
+      fInc.disabled = true;
+      const m = document.createElement('div'); m.textContent = 'GOAL REACHED! ★'; log.prepend(m);
+    }
+    // allow dec now
+    fDec.disabled = currentCount <= startCount;
+  };
+
+  fDec.onclick = () => {
+    if(currentCount <= startCount) return;
+    currentCount--;
+    updateProgress();
+    updateETA();
+    document.getElementById('focusCount').textContent = currentCount;
+    document.getElementById('focusPercent').textContent = percentDisplay.textContent;
+    fProgressFill.style.width = progressFill.style.width;
+    const li = document.createElement('div'); li.textContent = '-1 (manual)'; log.prepend(li);
+    saveState();
+    fDec.disabled = currentCount <= startCount;
+    fInc.disabled = false;
+  };
+
+  fExit.onclick = () => exitFocusMode();
+}
+
+function exitFocusMode(){
+  isFocus = false;
+  // remove overlay
+  const overlay = document.getElementById('focusOverlayInner');
+  if(overlay) overlay.remove();
+  // restore UI
+  document.getElementById('stage').style.display = '';
+  document.getElementById('soundboard').style.display = '';
+  document.getElementById('musicPlayerContainer').style.display = '';
+  // exit fullscreen if active
+  if(document.fullscreenElement) document.exitFullscreen().catch(()=>{});
+  focusBtn.textContent = 'FOCUS MODE';
+  // update main displays
+  updateProgress();
+  updateETA();
+}
+
+/* Focus button toggles overlay */
 focusBtn.onclick = () => {
-  document.querySelector(".left").style.display = "none";
-  document.querySelector("#musicPlayerContainer").style.display = "none";
-  document.querySelector("#soundboard").style.display = "none";
-  focusOverlay.style.display = "flex";
-  updateFocusDisplay();
+  if(!isFocus) enterFocusMode();
+  else exitFocusMode();
 };
 
-exitFocusBtn.onclick = () => {
-  document.querySelector(".left").style.display = "block";
-  document.querySelector("#musicPlayerContainer").style.display = "block";
-  document.querySelector("#soundboard").style.display = "flex";
-  focusOverlay.style.display = "none";
-  updateFocusDisplay();
+/* ============================
+   Timers keep track but pause when isFocus=true or paused=true
+   (totalTimer & incTimer used for updating main displays when appropriate)
+   ============================ */
+if(!totalTimer) {
+  totalTimer = setInterval(()=> {
+    if(!paused && !isFocus && startTime){
+      totalTimeDisplay.textContent = ((Date.now()-startTime)/1000).toFixed(2) + 's';
+    }
+  }, 100);
+}
+if(!incTimer){
+  incTimer = setInterval(()=> {
+    if(!paused && !isFocus && lastInc){
+      incrementTimeDisplay.textContent = ((Date.now()-lastInc)/1000).toFixed(2) + 's';
+    }
+  }, 100);
+}
+
+/* ============================
+   Soundboard & Music Player
+   ============================ */
+
+/* Sound files (local filenames expected) */
+const sounds = ["atw.wav","comeon.wav","getlucky2.wav","hbfs1.wav","hbfs2.wav","humanafterall.wav","robotrock.wav"];
+const soundboard = document.getElementById('soundboard');
+const audioObjs = {};
+sounds.forEach(s => {
+  const btn = document.createElement('button');
+  btn.className = 'sound-btn';
+  btn.textContent = s.replace('.wav','').toUpperCase();
+  const audio = new Audio(s);
+  audioObjs[s] = audio;
+  btn.addEventListener('click', () => {
+    if(!audio.paused){
+      audio.pause(); audio.currentTime = 0; btn.classList.remove('active');
+    } else {
+      // stop others
+      Object.values(audioObjs).forEach(a=>{ try{ a.pause(); a.currentTime=0; }catch(e){} });
+      Array.from(soundboard.children).forEach(c=>c.classList.remove('active'));
+      audio.play(); btn.classList.add('active');
+    }
+  });
+  audio.onended = () => btn.classList.remove('active');
+  soundboard.appendChild(btn);
+});
+
+/* Albums data (same as previous) */
+const albums = [
+  {
+    name: "Homework",
+    cover: "homework.png",
+    songs: [
+      { title: "Daftendirekt", url: "https://www.youtube.com/embed/yuoghR-5-Xs" },
+      { title: "WDPK 83.7 FM", url: "https://www.youtube.com/embed/OzZAHvq_UqI" },
+      { title: "Revolution 909", url: "https://www.youtube.com/embed/uURB-vo9rZ4" },
+      { title: "Da Funk", url: "https://www.youtube.com/embed/mmi60Bd4jSs" },
+      { title: "Phœnix", url: "https://www.youtube.com/embed/5AJ8yHebaok" },
+      { title: "Fresh", url: "https://www.youtube.com/embed/6TOXw9zQCAc" },
+      { title: "Around The World", url: "https://www.youtube.com/embed/K0HSD_i2DvA" },
+      { title: "Rollin' & Scratchin", url: "https://www.youtube.com/embed/XlUutoCywnk" },
+      { title: "Teachers", url: "https://www.youtube.com/embed/3yq-NFiEywo" },
+      { title: "High Fidelity", url: "https://www.youtube.com/embed/JXWkKO4eplY" },
+      { title: "Rock'n Roll", url: "https://www.youtube.com/embed/ZW7WfdTuth8" },
+      { title: "Oh Yeah", url: "https://www.youtube.com/embed/zr28TRk9vCg" },
+      { title: "Burnin'", url: "https://www.youtube.com/embed/DBHipNYuAZk" },
+      { title: "Indo Silver Club", url: "https://www.youtube.com/embed/VubH7FuW6TQ" },
+      { title: "Alive", url: "https://www.youtube.com/embed/WY8hqzYT_uk" },
+      { title: "Funk Ad", url: "https://www.youtube.com/embed/YqUyNvGsM9s" }
+    ]
+  },
+  {
+    name: "Discovery",
+    cover: "discovery.png",
+    songs: [
+      { title: "One More Time", url: "https://www.youtube.com/embed/A2VpR8HahKc" },
+      { title: "Aerodynamic", url: "https://www.youtube.com/embed/Mjpu0-o9iek" },
+      { title: "Digital Love", url: "https://www.youtube.com/embed/4whD6uAryMs" },
+      { title: "Harder, Better, Faster, Stronger", url: "https://www.youtube.com/embed/yydNF8tuVmU" },
+      { title: "Crescendolls", url: "https://www.youtube.com/embed/oor2uIqys8M" },
+      { title: "Nightvision", url: "https://www.youtube.com/embed/NQ-mm1H7uJw" },
+      { title: "Superheroes", url: "https://www.youtube.com/embed/UBGfS7S9BYg" },
+      { title: "High Life", url: "https://www.youtube.com/embed/KlUtJOTmmk8" },
+      { title: "Something About Us", url: "https://www.youtube.com/embed/em0MknB6wFo" },
+      { title: "Voyager", url: "https://www.youtube.com/embed/INbgG9M0WYE" },
+      { title: "Veridis Quo", url: "https://www.youtube.com/embed/TCd6PfxOy0Y" },
+      { title: "Short Circuit", url: "https://www.youtube.com/embed/9hhVnRTNVmM" },
+      { title: "Face to Face", url: "https://www.youtube.com/embed/UKYWWfR_GKA" },
+      { title: "Too Long", url: "https://www.youtube.com/embed/ROF4uNjrB4U" }
+    ]
+  },
+  {
+    name: "Human After All",
+    cover: "human_after_all.png",
+    songs: [
+      { title: "Human After All", url: "https://www.youtube.com/embed/PXYeARRyDWk" },
+      { title: "The Prime Time Of Your Life", url: "https://www.youtube.com/embed/QwRlt1XyOg0" },
+      { title: "Robot Rock", url: "https://www.youtube.com/embed/sFZjqVnWBhc" },
+      { title: "Steam Machine", url: "https://www.youtube.com/embed/0sa2R-PM0Uk" },
+      { title: "Make Love", url: "https://www.youtube.com/embed/UeZG0viNAjM" },
+      { title: "The Brainwasher", url: "https://www.youtube.com/embed/RdVEQbWjaTE" },
+      { title: "On/Off", url: "https://www.youtube.com/embed/xf5kjtSW1aM" },
+      { title: "Television Rules the Nation", url: "https://www.youtube.com/embed/StACmxSQKY8" },
+      { title: "Technologic", url: "https://www.youtube.com/embed/D8K90hX4PrE" },
+      { title: "Emotion", url: "https://www.youtube.com/embed/d-OGBZSDKBU" }
+    ]
+  },
+  {
+    name: "Alive 2007",
+    cover: "alive_2007.png",
+    songs: [
+      { title: "Robot Rock / Oh Yeah", url: "https://www.youtube.com/embed/lVKbF8khsrI" },
+      { title: "Touch It / Technologic", url: "https://www.youtube.com/embed/NFxyYYRqobw" },
+      { title: "Television Rules the Nation / Crescendolls", url: "https://www.youtube.com/embed/Hg3G1E2tNCA" },
+      { title: "Too Long / Steam Machine", url: "https://www.youtube.com/embed/l4SFUztLWOA" },
+      { title: "Around the World / Harder, Better, Faster, Stronger", url: "https://www.youtube.com/embed/0fllyJTBsRU" },
+      { title: "Burnin' / Too Long", url: "https://www.youtube.com/embed/USpepfrrCNs" },
+      { title: "Face to Face / Short Circuit", url: "https://www.youtube.com/embed/ZXhwXhv37Ps" },
+      { title: "One More Time / Aerodynamic", url: "https://www.youtube.com/embed/evqx5HLm9iM" },
+      { title: "Aerodynamic Beats / Forget About the World", url: "https://www.youtube.com/embed/TycgkK2gFvA" },
+      { title: "The Prime Time of Your Life/The Brainwasher/Rollin'/Alive", url: "https://www.youtube.com/embed/3AsRI_cSie0" },
+      { title: "Da Funk / Daftendirekt", url: "https://www.youtube.com/embed/Im6Fsd92n3k" },
+      { title: "Superheroes / Human After All / Rock'n Roll", url: "https://www.youtube.com/embed/Kccj6KPAKcE" },
+      { title: "Human After All / Together / One More Time / Music Sounds", url: "https://www.youtube.com/embed/uOdm7-YMoUU" }
+    ]
+  },
+  {
+    name: "Random Access Memories",
+    cover: "ram.png",
+    songs: [
+      { title: "Give Life Back to Music", url: "https://www.youtube.com/embed/zKSsP2084nU" },
+      { title: "The Game of Love", url: "https://www.youtube.com/embed/_vOcbrUsmjM" },
+      { title: "Giorgio by Moroder", url: "https://www.youtube.com/embed/ZFZM6jDTWd4" },
+      { title: "Within", url: "https://www.youtube.com/embed/iNjGNNoUjkk" },
+      { title: "Instant Crush", url: "https://www.youtube.com/embed/khnokW3Mw24" },
+      { title: "Lose Yourself to Dance", url: "https://www.youtube.com/embed/iU7oF4OXZSE" },
+      { title: "Touch", url: "https://www.youtube.com/embed/RRMbhEdmhYw" },
+      { title: "Get Lucky", url: "https://www.youtube.com/embed/4D7u5KF7SP8" },
+      { title: "Beyond", url: "https://www.youtube.com/embed/RE_XX6jk2Lo" },
+      { title: "Motherboard", url: "https://www.youtube.com/embed/3x-Q-iRvib4" },
+      { title: "Fragments of Time", url: "https://www.youtube.com/embed/3rpQTqpFTF4" },
+      { title: "Doin' it Right", url: "https://www.youtube.com/embed/wmSkU6R9Zi8" },
+      { title: "Contact", url: "https://www.youtube.com/embed/UoF1dFWKsVk" }
+    ]
+  }
+];
+
+// ==== FUNCTIONS ====
+function showAlbumSelection() {
+  albumSelection.innerHTML = "";
+  musicPlayerContainer.style.display = "block";
+  albumPlayer.style.display = "none";
+
+  albums.forEach((album, index) => {
+    const btn = document.createElement("button");
+    btn.textContent = album.name;
+    btn.className = "btn";
+    btn.onclick = () => selectAlbum(index);
+    albumSelection.appendChild(btn);
+  });
+}
+
+function selectAlbum(index) {
+  currentAlbum = albums[index];
+  currentSongIndex = 0;
+  albumSelection.style.display = "none";
+  albumPlayer.style.display = "flex";
+
+  const albumCover = document.getElementById("albumCover");
+  albumCover.src = currentAlbum.cover;
+  albumCover.alt = currentAlbum.name;
+  loadSongList();
+}
+
+function loadSongList() {
+  songList.innerHTML = "";
+  currentAlbum.songs.forEach((song, i) => {
+    const sBtn = document.createElement("div");
+    sBtn.textContent = song.title;
+    sBtn.className = "song-item";
+    sBtn.style.cursor = "pointer";
+    sBtn.style.padding = "4px";
+    sBtn.style.borderBottom = "1px solid #444";
+
+    sBtn.onclick = () => {
+      const videoId = song.url.split("/embed/")[1];
+      const videoURL = "https://music.youtube.com/watch?v=" + videoId;
+
+      if (popupWindow && !popupWindow.closed) {
+        popupWindow.location.href = videoURL;
+        popupWindow.focus();
+      } else {
+        popupWindow = window.open(videoURL, "ytPopup", "width=640,height=360,resizable=yes,scrollbars=no");
+      }
+    };
+    songList.appendChild(sBtn);
+  });
+}
+
+backBtn.onclick = () => {
+  albumSelection.style.display = "block";
+  albumPlayer.style.display = "none";
+  currentAlbum = null;
 };
 
-setInterval(() => {
-  if (focusOverlay.style.display === "flex") updateFocusDisplay();
-}, 200);
+// Initialize album selection
+showAlbumSelection();
+
+/* Initial UI amplitude */
+updateProgress();
+updateETA();
+
+/* End of script */
 </script>
 </body>
 </html>
